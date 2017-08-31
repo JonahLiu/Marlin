@@ -337,8 +337,8 @@
 //homing hits the endstop, then retracts by this distance, before it tries to slowly bump again:
 #define X_HOME_BUMP_MM 5
 #define Y_HOME_BUMP_MM 5
-#define Z_HOME_BUMP_MM 2
-#define HOMING_BUMP_DIVISOR {2, 2, 4}  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
+#define Z_HOME_BUMP_MM 5 // deltas need the same for all three axis
+#define HOMING_BUMP_DIVISOR {10, 10, 10}  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
 //#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
 
 // When G28 is called, this option will make Y home before X
@@ -360,7 +360,7 @@
 // Default stepper release if idle. Set to 0 to deactivate.
 // Steppers will shut down DEFAULT_STEPPER_DEACTIVE_TIME seconds after the last move when DISABLE_INACTIVE_? is true.
 // Time can be set by M18 and M84.
-#define DEFAULT_STEPPER_DEACTIVE_TIME 120
+#define DEFAULT_STEPPER_DEACTIVE_TIME 60
 #define DISABLE_INACTIVE_X true
 #define DISABLE_INACTIVE_Y true
 #define DISABLE_INACTIVE_Z true  // set to false if the nozzle will fall down on your printed part when print has finished.
@@ -374,7 +374,8 @@
 // @section lcd
 
 #if ENABLED(ULTIPANEL)
-  #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60} // Feedrates for manual moves along X, Y, Z, E from panel
+  #define MANUAL_FEEDRATE_XYZ 50*60
+  #define MANUAL_FEEDRATE { MANUAL_FEEDRATE_XYZ, MANUAL_FEEDRATE_XYZ, MANUAL_FEEDRATE_XYZ, 60 } // Feedrates for manual moves along X, Y, Z, E from panel
   #define ULTIPANEL_FEEDMULTIPLY  // Comment to disable setting feedrate multiplier via encoder
 #endif
 
@@ -384,7 +385,8 @@
 #define DEFAULT_MINSEGMENTTIME        20000
 
 // If defined the movements slow down when the look ahead buffer is only half full
-#define SLOWDOWN
+// (don't use SLOWDOWN with DELTA because DELTA generates hundreds of segments per second)
+//#define SLOWDOWN
 
 // Frequency limit
 // See nophead's blog for more info
@@ -598,7 +600,35 @@
   #define DOUBLECLICK_MAX_INTERVAL 1250 // Maximum interval between clicks, in milliseconds.
                                         // Note: Extra time may be added to mitigate controller latency.
 #endif
-
+//
+// Ensure Smooth Moves
+//
+// Enable this option to prevent the machine from stuttering when printing multiple short segments.
+// This feature uses two strategies to eliminate stuttering:
+//
+// 1. During short segments a Graphical LCD update may take so much time that the planner buffer gets
+//    completely drained. When this happens pauses are introduced between short segments, and print moves
+//    will become jerky until a longer segment provides enough time for the buffer to be filled again.
+//    This jerkiness negatively affects print quality. The ENSURE_SMOOTH_MOVES option addresses the issue
+//    by pausing the LCD until there's enough time to safely update.
+//
+//    NOTE: This will cause the Info Screen to lag and controller buttons may become unresponsive.
+//          Enable ALWAYS_ALLOW_MENU to keep the controller responsive.
+//
+// 2. No block is allowed to take less time than MIN_BLOCK_TIME. That's the time it takes in the main
+//    loop to add a new block to the buffer, check temperatures, etc., including all blocked time due to
+//    interrupts (without LCD update). By enforcing a minimum time-per-move, the buffer is prevented from
+//    draining.
+//
+#define ENSURE_SMOOTH_MOVES
+#if ENABLED(ENSURE_SMOOTH_MOVES)
+  //#define ALWAYS_ALLOW_MENU      // If enabled, the menu will always be responsive.
+                                   // WARNING: Menu navigation during short moves may cause stuttering!
+  #define LCD_UPDATE_THRESHOLD 135 // (ms) Minimum duration for the current segment to allow an LCD update.
+                                   // Default value is good for graphical LCDs (e.g., REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER).
+                                   // You may try to lower this value until you printer starts stuttering again as if ENSURE_SMOOTH_MOVES is disabled.
+  #define MIN_BLOCK_TIME 6         // (ms) Minimum duration of a single block. You shouldn't need to modify this.
+#endif
 // @section extruder
 
 // extruder advance constant (s2/mm3)
@@ -620,7 +650,14 @@
  *
  * Assumption: advance = k * (delta velocity)
  * K=0 means advance disabled.
- * See Marlin documentation for calibration instructions.
+ * To get a rough start value for calibration, measure your "free filament length"
+ * between the hobbed bolt and the nozzle (in cm). Use the formula below that fits
+ * your setup, where L is the "free filament length":
+ *
+ * Filament diameter           |   1.75mm  |    3.0mm   |
+ * ----------------------------|-----------|------------|
+ * Stiff filament (PLA)        | K=47*L/10 | K=139*L/10 |
+ * Softer filament (ABS, nGen) | K=88*L/10 | K=260*L/10 |
  */
 //#define LIN_ADVANCE
 
@@ -670,10 +707,6 @@
   #define UBL_MESH_MAX_X (X_MAX_POS - (UBL_MESH_INSET))
   #define UBL_MESH_MIN_Y (Y_MIN_POS + UBL_MESH_INSET)
   #define UBL_MESH_MAX_Y (Y_MAX_POS - (UBL_MESH_INSET))
-
-  // If this is defined, the currently active mesh will be saved in the
-  // current slot on M500.
-  #define UBL_SAVE_ACTIVE_ON_M500
 #endif
 
 // @section extras
