@@ -118,7 +118,7 @@
 // The following define selects which electronics board you have.
 // Please choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_13_EFB
+  #define MOTHERBOARD BOARD_RAMPS_14_EFB
 #endif
 
 // Optional custom name for your RepStrap or other custom machine
@@ -638,13 +638,6 @@
 //
 
 /**
- * Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
- *
- * Enable this option for a probe connected to the Z Min endstop pin.
- */
-#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
-
-/**
  * Z_MIN_PROBE_ENDSTOP
  *
  * Enable this option for a probe connected to any pin except Z-Min.
@@ -677,13 +670,13 @@
  * Use G29 repeatedly, adjusting the Z height at each point with movement commands
  * or (with LCD_BED_LEVELING) the LCD controller.
  */
-#define PROBE_MANUALLY
+//#define PROBE_MANUALLY
 
 /**
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
  *   (e.g., an inductive probe or a nozzle-based probe-switch.)
  */
-//#define FIX_MOUNTED_PROBE
+#define FIX_MOUNTED_PROBE
 
 /**
  * Z Servo Probe, such as an endstop switch on a rotating arm.
@@ -706,8 +699,8 @@
  * These options are most useful for the BLTouch probe, but may also improve
  * readings with inductive probes and piezo sensors.
  */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
-//#define PROBING_FANS_OFF          // Turn fans off when probing
+#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+#define PROBING_FANS_OFF          // Turn fans off when probing
 //#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 
 // A probe that is deployed and stowed with a solenoid pin (SOL1_PIN)
@@ -743,8 +736,8 @@
  *    (0,0)
  */
 #define X_PROBE_OFFSET_FROM_EXTRUDER 0     // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER -10   // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -3.5  // Z offset: -below +above  [the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER 0   // Y offset: -front +behind [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER 0  // Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED 4000
@@ -755,7 +748,7 @@
 #define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
 
 // Use double touch for probing
-//#define PROBE_DOUBLE_TOUCH
+#define PROBE_DOUBLE_TOUCH
 
 // Allen key retractable z-probe as seen on many Kossel delta printers - http://reprap.org/wiki/Kossel#Automatic_bed_leveling_probe
 // Deploys by touching z-axis belt. Retracts by pushing the probe down. Uses Z_MIN_PIN.
@@ -847,9 +840,6 @@
 #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 
 // To use a probe you must enable one of the two options above!
-
-// Enable Z Probe Repeatability test to see how accurate your probe is
-//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 /**
  * Z probes require clearance when deploying, stowing, and moving between
@@ -994,7 +984,7 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR
+//#define AUTO_BED_LEVELING_BILINEAR
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
@@ -1055,12 +1045,12 @@
 
   // 3 arbitrary points to probe.
   // A simple cross-product is used to estimate the plane of the bed.
-  #define ABL_PROBE_PT_1_X 15
-  #define ABL_PROBE_PT_1_Y 180
-  #define ABL_PROBE_PT_2_X 15
-  #define ABL_PROBE_PT_2_Y 20
-  #define ABL_PROBE_PT_3_X 170
-  #define ABL_PROBE_PT_3_Y 20
+  #define ABL_PROBE_PT_1_X -53
+  #define ABL_PROBE_PT_1_Y -28
+  #define ABL_PROBE_PT_2_X 53
+  #define ABL_PROBE_PT_2_Y -28
+  #define ABL_PROBE_PT_3_X 0
+  #define ABL_PROBE_PT_3_Y 53
 
 #elif ENABLED(AUTO_BED_LEVELING_UBL)
 
@@ -1072,12 +1062,12 @@
   #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  #define UBL_PROBE_PT_1_X 39       // Probing points for 3-Point leveling of the mesh
-  #define UBL_PROBE_PT_1_Y 180
-  #define UBL_PROBE_PT_2_X 39
-  #define UBL_PROBE_PT_2_Y 20
-  #define UBL_PROBE_PT_3_X 180
-  #define UBL_PROBE_PT_3_Y 20
+  #define UBL_PROBE_PT_1_X -53      // Probing points for 3-Point leveling of the mesh
+  #define UBL_PROBE_PT_1_Y -28
+  #define UBL_PROBE_PT_2_X 53
+  #define UBL_PROBE_PT_2_Y -28
+  #define UBL_PROBE_PT_3_X 0
+  #define UBL_PROBE_PT_3_Y 53
 
   //#define UBL_G26_MESH_VALIDATION // Enable G26 mesh validation
   #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
@@ -1100,7 +1090,7 @@
  * Use the LCD controller for bed leveling
  * Requires MESH_BED_LEVELING or PROBE_MANUALLY
  */
-#define LCD_BED_LEVELING
+//#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
   #define MBL_Z_STEP 0.025    // Step size while manually probing Z axis.
@@ -1258,7 +1248,7 @@
  * Attention: EXPERIMENTAL. G-code arguments may change.
  *
  */
-#define NOZZLE_CLEAN_FEATURE
+//#define NOZZLE_CLEAN_FEATURE
 
 #if ENABLED(NOZZLE_CLEAN_FEATURE)
   // Default number of pattern repetitions
@@ -1456,8 +1446,8 @@
 // Note: Test audio output with the G-Code:
 //  M300 S<frequency Hz> P<duration ms>
 //
-//#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100
-//#define LCD_FEEDBACK_FREQUENCY_HZ 1000
+#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100
+#define LCD_FEEDBACK_FREQUENCY_HZ 1000
 
 //
 // CONTROLLER TYPE: Standard
