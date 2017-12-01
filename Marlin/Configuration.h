@@ -110,7 +110,7 @@
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000]
  */
-#define BAUDRATE 250000
+#define BAUDRATE 115200
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
@@ -617,9 +617,9 @@
  * When changing speed and direction, if the difference is less than the
  * value set here, it may happen instantaneously.
  */
-#define DEFAULT_XJERK                 20.0
-#define DEFAULT_YJERK                 20.0
-#define DEFAULT_ZJERK                 20.0 // Must be same as XY for delta
+#define DEFAULT_XJERK                  2.0
+#define DEFAULT_YJERK                  2.0
+#define DEFAULT_ZJERK                  2.0 // Must be same as XY for delta
 #define DEFAULT_EJERK                  5.0
 
 //===========================================================================
